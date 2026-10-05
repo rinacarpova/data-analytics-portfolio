@@ -26,7 +26,12 @@ The first run downloads the source data and saves a small daily aggregate to `da
 
 > Citation: Chen, D. (2012). *Online Retail II* [Dataset]. UCI Machine Learning Repository.
 
-## Run
+## Two ways to view the project
+
+- **`revenue_plan.ipynb`** — portfolio/presentation version. The logic is split into business steps, with explanations, intermediate tables, reconciliation checks and saved outputs visible directly on GitHub.
+- **`revenue_plan.py`** — compact runnable version for executing the workflow end-to-end in one command.
+
+### Run the script
 
 ```bash
 python -m venv .venv
@@ -35,7 +40,7 @@ pip install -r requirements.txt
 python revenue_plan.py
 ```
 
-Or open `revenue_plan.ipynb` in Jupyter.
+Or open `revenue_plan.ipynb` in Jupyter to follow the calculation step by step.
 
 All business inputs are grouped near the top of the code: plan start, YoY target, organic growth and the Direct Sales plan.
 
@@ -51,8 +56,8 @@ All business inputs are grouped near the top of the code: plan start, YoY target
 ## Structure
 
 ```
-├── revenue_plan.py         # runnable Python version
-├── revenue_plan.ipynb      # notebook version
+├── revenue_plan.py         # one-command runnable workflow
+├── revenue_plan.ipynb      # step-by-step portfolio notebook with outputs
 ├── data/                   # generated cache on first run
 ├── output/                 # generated Excel plan + overview chart
 ├── requirements.txt
