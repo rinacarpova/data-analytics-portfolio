@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="480" viewBox="0 0 1400 480">
+<style>
+text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#24292f}
+.title{font-size:21px;font-weight:600}.label{font-size:13px}.axis{stroke:#8c959f;stroke-width:1}.grid{stroke:#d8dee4;stroke-width:1}.actual{fill:none;stroke:#0969da;stroke-width:3}.base{fill:none;stroke:#6e7781;stroke-width:3;stroke-dasharray:8 6}.plan{fill:none;stroke:#1a7f37;stroke-width:3}.bar{fill:#2da44e}.direct{fill:#bf8700}
+</style>
+<rect width="1400" height="480" fill="white"/>
+<text x="55" y="35" class="title">Programmatic revenue: history and plan</text>
+<text x="770" y="35" class="title">Monthly total plan</text>
+<!-- left grid -->
+<line x1="60" y1="420" x2="700" y2="420" class="axis"/><line x1="60" y1="70" x2="60" y2="420" class="axis"/>
+<line x1="60" y1="332" x2="700" y2="332" class="grid"/><line x1="60" y1="245" x2="700" y2="245" class="grid"/><line x1="60" y1="157" x2="700" y2="157" class="grid"/><line x1="60" y1="70" x2="700" y2="70" class="grid"/>
+<text x="20" y="424" class="label">0</text><text x="8" y="336" class="label">0.5m</text><text x="8" y="249" class="label">1.0m</text><text x="8" y="161" class="label">1.5m</text><text x="8" y="74" class="label">2.0m</text>
+<!-- actual history -->
+<polyline class="actual" points="60,280 86,313 112,326 138,287 164,307 190,307 216,298 242,309 268,302 294,268 320,228 346,170 372,284 398,303 424,331 450,299 476,330 502,291 528,291 554,300 580,293 606,240 632,227 658,166"/>
+<!-- plan & base -->
+<polyline class="base" points="684,281 708,300 732,329 756,296 780,328 804,287 828,287 852,298 876,292 900,236 924,222 948,159"/>
+<polyline class="plan" points="684,250 708,273 732,309 756,269 780,307 804,258 828,259 852,270 876,263 900,195 924,178 948,102"/>
+<line x1="82" y1="447" x2="110" y2="447" class="actual"/><text x="117" y="452" class="label">Actual</text>
+<line x1="190" y1="447" x2="218" y2="447" class="base"/><text x="225" y="452" class="label">Organic baseline</text>
+<line x1="345" y1="447" x2="373" y2="447" class="plan"/><text x="380" y="452" class="label">Programmatic plan</text>
+<!-- right grid -->
+<line x1="770" y1="420" x2="1360" y2="420" class="axis"/><line x1="770" y1="70" x2="770" y2="420" class="axis"/>
+<line x1="770" y1="332" x2="1360" y2="332" class="grid"/><line x1="770" y1="245" x2="1360" y2="245" class="grid"/><line x1="770" y1="157" x2="1360" y2="157" class="grid"/><line x1="770" y1="70" x2="1360" y2="70" class="grid"/>
+<!-- stacked bars: programmatic + direct sales -->
+<g>
+<rect x="790" y="250" width="30" height="170" class="bar"/><rect x="790" y="247" width="30" height="3" class="direct"/>
+<rect x="836" y="273" width="30" height="147" class="bar"/><rect x="836" y="270" width="30" height="3" class="direct"/>
+<rect x="882" y="309" width="30" height="111" class="bar"/><rect x="882" y="306" width="30" height="3" class="direct"/>
+<rect x="928" y="269" width="30" height="151" class="bar"/><rect x="928" y="266" width="30" height="3" class="direct"/>
+<rect x="974" y="307" width="30" height="113" class="bar"/><rect x="974" y="304" width="30" height="3" class="direct"/>
+<rect x="1020" y="258" width="30" height="162" class="bar"/><rect x="1020" y="255" width="30" height="3" class="direct"/>
+<rect x="1066" y="259" width="30" height="161" class="bar"/><rect x="1066" y="256" width="30" height="3" class="direct"/>
+<rect x="1112" y="270" width="30" height="150" class="bar"/><rect x="1112" y="267" width="30" height="3" class="direct"/>
+<rect x="1158" y="263" width="30" height="157" class="bar"/><rect x="1158" y="260" width="30" height="3" class="direct"/>
+<rect x="1204" y="195" width="30" height="225" class="bar"/><rect x="1204" y="192" width="30" height="3" class="direct"/>
+<rect x="1250" y="178" width="30" height="242" class="bar"/><rect x="1250" y="175" width="30" height="3" class="direct"/>
+<rect x="1296" y="102" width="30" height="318" class="bar"/><rect x="1296" y="99" width="30" height="3" class="direct"/>
+</g>
+<text x="790" y="440" class="label">Dec</text><text x="836" y="440" class="label">Jan</text><text x="882" y="440" class="label">Feb</text><text x="928" y="440" class="label">Mar</text><text x="974" y="440" class="label">Apr</text><text x="1020" y="440" class="label">May</text><text x="1066" y="440" class="label">Jun</text><text x="1112" y="440" class="label">Jul</text><text x="1158" y="440" class="label">Aug</text><text x="1204" y="440" class="label">Sep</text><text x="1250" y="440" class="label">Oct</text><text x="1296" y="440" class="label">Nov</text>
+<rect x="1125" y="45" width="16" height="12" class="bar"/><text x="1147" y="56" class="label">Programmatic plan</text>
+<rect x="1270" y="45" width="16" height="12" class="direct"/><text x="1292" y="56" class="label">Direct Sales</text>
+</svg>
