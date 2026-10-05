@@ -12,3 +12,8 @@ The projects focus on:
 - business analysis
 
 All projects use public or synthetic data and do not contain confidential company information.
+
+## Projects
+
+### [Annual Revenue Plan by Segment](annual-revenue-planning/)
+A Python/Jupyter project that builds a 12-month revenue plan from public transaction data, preserves seasonal patterns, reconciles rounding, validates the final target, and exports the plan to Excel.
