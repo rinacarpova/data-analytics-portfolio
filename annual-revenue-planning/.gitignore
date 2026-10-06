@@ -1,7 +1,0 @@
-.ipynb_checkpoints/
-__pycache__/
-.venv/
-data/*.zip
-data/*.xlsx
-output/*.xlsx
-output/*.png
