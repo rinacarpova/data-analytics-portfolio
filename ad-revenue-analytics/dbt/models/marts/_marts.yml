@@ -71,7 +71,8 @@ models:
       Daily revenue alerts, one row per alert: the total moving more than its usual noise,
       a material slice that stopped delivering, or a large slice that moved. Each alert carries
       its volume and price effects and a one-line explanation. The rules and thresholds are dbt
-      vars (alert_*); see the model for details.
+      vars (alert_*); see the model for details. Thresholds are calibrated retrospectively on the
+      available month, so this is a retrospective scan, not a causal production backtest.
     data_tests:
       - unique_combination:
           arguments:

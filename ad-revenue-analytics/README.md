@@ -38,11 +38,13 @@ Four causal detectors were scored against 14 hand-labelled anomaly windows on re
 | Level shift | 0.50 | 0.43 | 0.46 |
 | Seasonal z-score (same hour) | 0.37 | 0.57 | 0.45 |
 
-- All four beat chance by a wide margin: random alerts would hit a window ~10% of the time.
-- **The differences between them are noise.** One window is 7 points of recall, and the ranking flips when the grid moves by one step. The rolling z-score is the stable choice: the same one-week window wins in every fold, while the robust z-score needs thresholds of 15–20 on these heavy-tailed series.
+- About 10% of timestamps fall inside labelled anomaly windows, so the observed precision (37–50%) is well above a simple point-level random baseline.
+- **The ranking is not robust enough to treat the differences as meaningful.** One window is 7 points of recall, and the ranking flips when the grid moves by one step; with 14 windows, no confidence intervals were attempted. The rolling z-score is the stable choice: the same one-week window wins in every fold, while the robust z-score needs thresholds of 15–20 on these heavy-tailed series.
 - **None of them catches the slow 15–20% dips of exchange-2** (0 of 3 windows): detectors tuned on spikes set thresholds far above a drift, and unlabelled dips of the same size happen nearby. Spikes and drifts need different detectors.
 
 ### Alerts that read as events
+
+> **Alert thresholds are calibrated retrospectively on the available month and are not a causal production backtest.** The "usual error" behind each threshold is measured over all of 15–30 June, including days after the alert and the anomalous days themselves. With one month of data this is a retrospective scan; a live monitor would estimate the error from past days only.
 
 The publisher data has no labels, so the detector lessons set the design of `mart_revenue_alerts`: one rule per kind of event (the total moving, a material slice stopping, a large slice moving), thresholds at twice the baseline's usual error for each dimension, a materiality floor and a 7-day cooldown. A plain "30% off and at least 1% of the day" threshold raises 205 alerts over 15–30 June, mostly on ad units; these rules raise 20 alerts on 6 days, each a readable event:
 
@@ -192,6 +194,7 @@ Then open [`notebooks/anomaly_detection.ipynb`](notebooks/anomaly_detection.ipyn
 ## Assumptions and limitations
 
 - The publisher data covers 30 days. The same-weekday baseline needs two weeks of history, so 16 days (15–30 June) can be compared: 7 against two previous weeks, 9 against three. Monthly patterns are not visible.
+- Alert thresholds are calibrated retrospectively on the same 16 days they are applied to (see *Alerts that read as events*), so the alert feed is a retrospective scan, not a causal backtest.
 - The baseline weeks include a mid-June eCPM dip (the week of 10 June averaged 1.88 against 2.08 the week before), so late-June rate effects partly include a rebound.
 - IDs are anonymised, so findings are stated in terms of IDs (e.g. "site 345"), not site or advertiser names.
 - Revenue is taken as reported (revenue share is 1.0 throughout).

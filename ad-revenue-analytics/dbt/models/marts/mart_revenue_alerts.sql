@@ -8,7 +8,10 @@
 --   large slice moved   a slice changed by at least alert_min_share_moved of the day's revenue
 --                       and by more than alert_noise_multiple × its dimension's usual error
 -- The usual error is the baseline's WAPE per dimension over the comparable days, so a noisy
--- dimension (ad units) needs a bigger move than a stable one (devices) to alert.
+-- dimension (ad units) needs a bigger move than a stable one (devices) to alert. WAPE divides by
+-- actual revenue, its standard definition; on a down day that makes the error slightly larger.
+-- Retrospective by design: the error is measured over all comparable days, including days after
+-- an alert and the anomalous days themselves. A live monitor would estimate it from past days only.
 -- An alert is raised once: while the same rule keeps firing for the same slice, or fires
 -- again within alert_cooldown_days, it stays quiet.
 
