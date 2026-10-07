@@ -1,0 +1,12 @@
+# Source data is downloaded by scripts/download_data.py and never committed
+data/raw/*
+!data/raw/.gitkeep
+data/*.duckdb
+data/*.duckdb.wal
+
+# dbt artefacts
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+dbt/.user.yml
+logs/

@@ -1,0 +1,25 @@
+sources:
+  - name: real_time_auction
+    description: >
+      Kaggle "Real time Advertiser's Auction" (saurav9786/real-time-advertisers-auction, v1).
+      Daily ad delivery of several websites owned by one publisher, June 2019, at revenue level
+      (not bid level). All IDs are anonymised by the dataset author.
+    tables:
+      - name: delivery
+        description: One row per day and combination of delivery dimensions.
+        meta:
+          external_location: "read_csv('{{ var('raw_data_path') }}/real_time_auction/Dataset.csv', header = true)"
+
+  - name: nab
+    description: >
+      Numenta Anomaly Benchmark (MIT license): hourly CPC and CPM of three online ad exchanges,
+      July–September 2011, with anomaly windows labelled by the benchmark authors.
+    tables:
+      - name: exchange_metrics
+        description: Six CSV files, one per exchange and metric; the metric is encoded in the file name.
+        meta:
+          external_location: "read_csv('{{ var('raw_data_path') }}/nab/realAdExchange/*.csv', header = true, filename = true)"
+      - name: anomaly_windows
+        description: NAB labels file, a JSON object mapping each benchmark series to its anomaly windows.
+        meta:
+          external_location: "read_json_objects('{{ var('raw_data_path') }}/nab/combined_windows.json')"

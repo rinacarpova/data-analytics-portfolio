@@ -1,0 +1,97 @@
+models:
+  - name: stg_auction__delivery
+    description: >
+      Publisher delivery with typed columns and analytics-friendly names. Same rows as the source.
+      The columns do not identify a row: 16.5K combinations of all dimensions appear more than once,
+      mostly with different metrics, so the export is at a finer grain than the columns it has
+      (e.g. line items or creatives). Rows are additive fragments of delivery: the marts sum them,
+      and nothing is deduplicated. The dataset author notes that order_id and line_item_type_id can
+      be ignored; they are kept here and aggregated away in the marts.
+    columns:
+      - name: report_date
+        data_tests: [not_null]
+      - name: site_id
+        data_tests: [not_null]
+      - name: integration_type_id
+        description: A single value in this dataset.
+      - name: impressions
+        data_tests: [not_null, non_negative]
+      - name: revenue
+        description: >
+          One row has negative revenue (-0.15 on 2019-06-24), most likely an adjustment.
+          It is kept so totals stay as reported.
+        data_tests:
+          - not_null
+          - non_negative:
+              config:
+                severity: warn
+      - name: viewable_impressions
+        description: >
+          Impressions viewable by the MRC standard (50% of pixels on screen for 1 second).
+          2.2K rows have more viewable than measurable impressions, mostly in channel 19 and
+          ad type 17. Excluding them moves overall viewability from 39.9% to 39.2%, so they are kept.
+        data_tests:
+          - non_negative
+          - not_greater_than:
+              arguments:
+                other_column: measurable_impressions
+              config:
+                severity: warn
+      - name: measurable_impressions
+        description: Impressions where viewability could be measured.
+        data_tests:
+          - non_negative
+          - not_greater_than:
+              arguments:
+                other_column: impressions
+              config:
+                severity: warn
+      - name: revenue_share_percent
+        description: >
+          Share of revenue that reaches the publisher, as a fraction despite the name.
+          It is 1.0 in every row, so revenue is used as reported.
+        data_tests:
+          - accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+  - name: stg_nab__exchange_metrics
+    description: Hourly CPC and CPM of three ad exchanges, all six series in one table, one value per hour.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [exchange, metric, observed_at]
+    columns:
+      - name: exchange
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [exchange-2, exchange-3, exchange-4]
+      - name: metric
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [CPC, CPM]
+      - name: observed_at
+        data_tests: [not_null]
+      - name: metric_value
+        data_tests: [not_null, non_negative]
+
+  - name: stg_nab__anomaly_windows
+    description: Labelled anomaly windows of the ad exchange series, one row per window.
+    columns:
+      - name: exchange
+        data_tests: [not_null]
+      - name: metric
+        data_tests: [not_null]
+      - name: window_start
+        data_tests:
+          - not_null
+          - not_greater_than:
+              arguments:
+                other_column: window_end
+      - name: window_end
+        data_tests: [not_null]

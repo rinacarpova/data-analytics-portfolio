@@ -1,0 +1,7 @@
+ad_revenue_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../data/ad_revenue.duckdb
+      threads: 4

@@ -17,3 +17,6 @@ All projects use public or synthetic data and do not contain confidential compan
 
 ### [Annual Revenue Plan by Segment](annual-revenue-planning/)
 A Python/Jupyter project that builds a 12-month revenue plan from public transaction data, preserves seasonal patterns, reconciles rounding, validates the final target, and exports the plan to Excel.
+
+### [Ad Revenue Analytics: Data Model and Anomaly Detection](ad-revenue-analytics/)
+A dbt + DuckDB project on public ad delivery data: a tested data model, a breakdown of every revenue change into traffic, mix and rate effects against a same-weekday baseline, anomaly detectors scored against labelled ad exchange data, and daily alerts that each come with their explanation.

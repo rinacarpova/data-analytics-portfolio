@@ -1,0 +1,8 @@
+duckdb>=1.5
+dbt-core>=1.12
+dbt-duckdb>=1.11
+kagglehub>=1.0
+pandas>=2.0
+matplotlib>=3.7
+jupyter
+pytest

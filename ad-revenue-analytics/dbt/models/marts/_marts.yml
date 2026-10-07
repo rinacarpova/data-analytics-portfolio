@@ -1,0 +1,185 @@
+models:
+  - name: fct_ad_delivery_daily
+    description: >
+      Daily publisher delivery by site, ad unit, ad type, monetisation channel, advertiser, geo,
+      device and OS, with eCPM and viewability.
+    columns:
+      - name: delivery_key
+        description: Hash of the grain columns.
+        data_tests: [unique, not_null]
+      - name: report_date
+        data_tests: [not_null]
+      - name: impressions
+        data_tests: [not_null, non_negative]
+      - name: revenue
+        description: Can be negative where the source has an adjustment (see stg_auction__delivery).
+        data_tests:
+          - not_null
+          - non_negative:
+              config:
+                severity: warn
+      - name: ecpm
+        description: Revenue per 1,000 impressions. Null when there are no impressions.
+      - name: viewability_rate
+        description: Viewable / measurable impressions.
+      - name: measurability_rate
+        description: Measurable / all impressions.
+
+  - name: mart_revenue_change_drivers
+    description: >
+      Revenue of every slice and day against its same-weekday baseline, with the change split into
+      a volume effect (impressions) and a price effect (eCPM). driver_rank orders the slices
+      of one dimension by the size of their change, so `driver_rank <= 5` gives the top drivers.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [report_date, dimension, dimension_value]
+    columns:
+      - name: revenue_delta
+        description: Revenue minus baseline revenue.
+      - name: volume_effect
+        description: Part of the change explained by impressions.
+      - name: price_effect
+        description: Part of the change explained by eCPM.
+      - name: unattributed_effect
+        description: Revenue change in slices with no impressions in either period.
+      - name: share_of_total_delta
+        description: The slice's share of the change of its dimension as a whole.
+      - name: driver_rank
+        data_tests: [not_null]
+
+  - name: mart_revenue_change_daily
+    description: >
+      Daily revenue against the same-weekday baseline, with the change split into traffic,
+      mix and rate effects at the fact grain. Answers whether a change came from more
+      impressions, from impressions moving to more (or less) valuable inventory, or from
+      the same inventory being paid differently.
+    columns:
+      - name: report_date
+        data_tests: [unique, not_null]
+      - name: traffic_effect
+        description: Change in total impressions, priced at the average total eCPM of the two periods.
+      - name: mix_effect
+        description: Impressions moving between slices with different eCPM.
+      - name: rate_effect
+        description: The same slices earning a different eCPM.
+      - name: unattributed_effect
+        description: Revenue change in slices with no impressions in either period.
+
+  - name: mart_revenue_alerts
+    description: >
+      Daily revenue alerts, one row per alert: the total moving more than its usual noise,
+      a material slice that stopped delivering, or a large slice that moved. Each alert carries
+      its volume and price effects and a one-line explanation. The rules and thresholds are dbt
+      vars (alert_*); see the model for details.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [report_date, rule, dimension, dimension_value]
+    columns:
+      - name: rule
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [total revenue, stopped delivering, large slice moved]
+      - name: change_threshold
+        description: Relative change the slice had to exceed, from its dimension's usual baseline error.
+      - name: main_driver
+        description: Whichever of volume and price explains more of the change.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [volume, price]
+      - name: alert_text
+        data_tests: [not_null]
+
+  - name: fct_exchange_metrics_hourly
+    description: Hourly CPC and CPM of three ad exchanges, flagged inside the labelled anomaly windows.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [exchange, metric, observed_at]
+    columns:
+      - name: is_labelled_anomaly
+        data_tests: [not_null]
+
+unit_tests:
+  - name: revenue_change_splits_into_volume_and_price
+    description: >
+      Covers the three cases of the split: a slice that delivered in both periods, a new slice,
+      and revenue reported without impressions.
+    model: mart_revenue_change_drivers
+    given:
+      - input: ref('int_delivery__vs_baseline')
+        rows:
+          # eCPM 2.0 -> 2.5 on 1,000 -> 1,200 impressions: +0.45 volume, +0.55 price
+          - {report_date: 2019-06-10, dimension: site_id, dimension_value: "351", impressions: 1200, revenue: 3.0, baseline_impressions: 1000, baseline_revenue: 2.0}
+          # new slice: the whole change is volume
+          - {report_date: 2019-06-10, dimension: site_id, dimension_value: "342", impressions: 500, revenue: 0.8, baseline_impressions: 0, baseline_revenue: 0}
+          # revenue without impressions cannot be split
+          - {report_date: 2019-06-10, dimension: site_id, dimension_value: "999", impressions: 0, revenue: 0.5, baseline_impressions: 0, baseline_revenue: 0}
+          # no revenue in either period: dropped
+          - {report_date: 2019-06-10, dimension: site_id, dimension_value: "000", impressions: 0, revenue: 0, baseline_impressions: 0, baseline_revenue: 0}
+    expect:
+      rows:
+        - {dimension_value: "351", revenue_delta: 1.0, volume_effect: 0.45, price_effect: 0.55, unattributed_effect: 0, driver_rank: 1}
+        - {dimension_value: "342", revenue_delta: 0.8, volume_effect: 0.8, price_effect: 0, unattributed_effect: 0, driver_rank: 2}
+        - {dimension_value: "999", revenue_delta: 0.5, volume_effect: 0, price_effect: 0, unattributed_effect: 0.5, driver_rank: 3}
+
+  - name: traffic_moving_to_expensive_inventory_is_mix
+    description: >
+      Total impressions and each slice's eCPM stay the same, but 500 impressions move from a
+      slice paid 1.0 to a slice paid 3.0: the whole +1.0 is mix.
+    model: mart_revenue_change_daily
+    given:
+      - input: ref('fct_ad_delivery_daily')
+        rows:
+          - {report_date: 2019-06-01, site_id: 1, impressions: 1000, revenue: 1.0}
+          - {report_date: 2019-06-01, site_id: 2, impressions: 1000, revenue: 3.0}
+          - {report_date: 2019-06-08, site_id: 1, impressions: 1000, revenue: 1.0}
+          - {report_date: 2019-06-08, site_id: 2, impressions: 1000, revenue: 3.0}
+          - {report_date: 2019-06-15, site_id: 1, impressions: 500, revenue: 0.5}
+          - {report_date: 2019-06-15, site_id: 2, impressions: 1500, revenue: 4.5}
+    expect:
+      rows:
+        - {report_date: 2019-06-15, baseline_weeks: 2, revenue_delta: 1.0, traffic_effect: 0, mix_effect: 1.0, rate_effect: 0, unattributed_effect: 0}
+
+  - name: one_slice_growing_and_repriced_has_no_mix
+    description: >
+      A single slice goes from 1,000 impressions at eCPM 2.0 to 1,200 at eCPM 2.5:
+      +0.45 traffic, +0.55 rate and no mix.
+    model: mart_revenue_change_daily
+    given:
+      - input: ref('fct_ad_delivery_daily')
+        rows:
+          - {report_date: 2019-06-01, site_id: 1, impressions: 1000, revenue: 2.0}
+          - {report_date: 2019-06-08, site_id: 1, impressions: 1000, revenue: 2.0}
+          - {report_date: 2019-06-15, site_id: 1, impressions: 1200, revenue: 3.0}
+    expect:
+      rows:
+        - {report_date: 2019-06-15, baseline_weeks: 2, revenue_delta: 1.0, traffic_effect: 0.45, mix_effect: 0, rate_effect: 0.55, unattributed_effect: 0}
+
+  - name: alerts_follow_their_rules_and_do_not_repeat
+    description: >
+      The total moving 3× its usual error alerts; a material slice going to zero alerts once,
+      not again the next day; a slice moving less than 5% of the day's revenue stays quiet.
+    model: mart_revenue_alerts
+    given:
+      - input: ref('int_delivery__vs_baseline')
+        rows:
+          # usual error: 10% for the total, 20% for channels
+          - {dimension: total, revenue: 100, baseline_revenue: 110}
+          - {dimension: monetization_channel_id, revenue: 50, baseline_revenue: 60}
+          - {dimension: monetization_channel_id, revenue: 50, baseline_revenue: 40}
+      - input: ref('mart_revenue_change_drivers')
+        rows:
+          - {report_date: 2019-06-15, dimension: total, dimension_value: total, baseline_revenue: 100, revenue: 130, revenue_delta: 30, volume_effect: 10, price_effect: 20}
+          - {report_date: 2019-06-15, dimension: monetization_channel_id, dimension_value: "21", baseline_revenue: 50, revenue: 0, revenue_delta: -50, volume_effect: -50, price_effect: 0}
+          - {report_date: 2019-06-15, dimension: monetization_channel_id, dimension_value: "4", baseline_revenue: 40, revenue: 44, revenue_delta: 4, volume_effect: 4, price_effect: 0}
+          - {report_date: 2019-06-16, dimension: total, dimension_value: total, baseline_revenue: 100, revenue: 115, revenue_delta: 15, volume_effect: 15, price_effect: 0}
+          - {report_date: 2019-06-16, dimension: monetization_channel_id, dimension_value: "21", baseline_revenue: 50, revenue: 0, revenue_delta: -50, volume_effect: -50, price_effect: 0}
+    expect:
+      rows:
+        - {report_date: 2019-06-15, rule: total revenue, dimension_value: total, main_driver: price}
+        - {report_date: 2019-06-15, rule: stopped delivering, dimension_value: "21", main_driver: volume}

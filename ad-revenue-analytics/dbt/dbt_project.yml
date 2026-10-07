@@ -1,0 +1,43 @@
+name: ad_revenue_analytics
+version: "1.0.0"
+config-version: 2
+profile: ad_revenue_analytics
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+
+vars:
+  # Paths are relative to this folder: run dbt from dbt/.
+  raw_data_path: ../data/raw
+  # A day is compared with the same weekday of up to baseline_weeks previous weeks;
+  # days with fewer than min_baseline_weeks of history get no baseline.
+  baseline_weeks: 3
+  min_baseline_weeks: 2
+  # Alert rules (mart_revenue_alerts): a change must exceed this many times the baseline's
+  # usual error, be material for the day, and an alert is not repeated within the cooldown.
+  alert_noise_multiple: 2
+  alert_min_share_moved: 0.05
+  alert_min_share_stopped: 0.01
+  alert_cooldown_days: 7
+  # Dimensions the revenue change is broken down by.
+  drilldown_dimensions:
+    - site_id
+    - ad_unit_id
+    - ad_type_id
+    - monetization_channel_id
+    - advertiser_id
+    - geo_id
+    - device_category_id
+    - os_id
+
+models:
+  ad_revenue_analytics:
+    # Tables, not views: the raw files are parsed once, and querying the database
+    # does not depend on the relative raw_data_path.
+    staging:
+      +materialized: table
+    intermediate:
+      +materialized: table
+    marts:
+      +materialized: table

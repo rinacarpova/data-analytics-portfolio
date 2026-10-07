@@ -1,0 +1,36 @@
+models:
+  - name: int_delivery__by_dimension_daily
+    description: >
+      Daily impressions and revenue per value of each drill-down dimension (var drilldown_dimensions),
+      plus a 'total' row per day.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [report_date, dimension, dimension_value]
+    columns:
+      - name: dimension
+        data_tests: [not_null]
+      - name: dimension_value
+        data_tests: [not_null]
+
+  - name: int_delivery__vs_baseline
+    description: >
+      Every slice and day next to its baseline: the average of the same weekday over up to
+      var baseline_weeks previous weeks. Days with fewer than var min_baseline_weeks weeks of
+      history are left out. On this data the same-weekday baseline misses daily revenue by
+      ~11% (WAPE) against ~16% for a trailing 7-day average.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [report_date, dimension, dimension_value]
+    columns:
+      - name: baseline_weeks
+        description: Number of previous same weekdays the baseline averages.
+        data_tests:
+          - not_null
+          - accepted_range:
+              arguments:
+                min_value: "{{ var('min_baseline_weeks') }}"
+                max_value: "{{ var('baseline_weeks') }}"
+      - name: trailing_7d_revenue
+        description: Average revenue of the previous 7 days, for comparing baselines only.
