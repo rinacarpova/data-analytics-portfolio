@@ -1,0 +1,11 @@
+{
+  "name": "ad-revenue-copilot",
+  "version": "0.1.0",
+  "description": "Workflow skills for ad revenue analytics on public publisher data: alert triage and a daily revenue brief, with an eval suite that measures what they add on top of plain data access. Use together with the ad-revenue-db plugin.",
+  "author": {
+    "name": "rinacarpova",
+    "url": "https://github.com/rinacarpova"
+  },
+  "repository": "https://github.com/rinacarpova/data-analytics-portfolio",
+  "keywords": ["analytics", "ad-monetization", "alert-triage", "reporting", "evals"]
+}

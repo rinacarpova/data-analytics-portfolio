@@ -1,0 +1,20 @@
+{
+  "name": "rinacarpova-analytics",
+  "description": "Claude Code plugins from a data analytics portfolio, built on public data.",
+  "owner": {
+    "name": "rinacarpova",
+    "url": "https://github.com/rinacarpova"
+  },
+  "plugins": [
+    {
+      "name": "ad-revenue-db",
+      "source": "./ad-revenue-copilot/plugins/ad-revenue-db",
+      "description": "Read-only MCP access to the ad-revenue-analytics DuckDB database."
+    },
+    {
+      "name": "ad-revenue-copilot",
+      "source": "./ad-revenue-copilot/plugins/ad-revenue-copilot",
+      "description": "Semantic layer for ad revenue analytics on public publisher data, with evals."
+    }
+  ]
+}

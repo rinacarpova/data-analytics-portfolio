@@ -1,0 +1,11 @@
+{
+  "name": "ad-revenue-db",
+  "version": "0.1.0",
+  "description": "Read-only MCP access to the ad-revenue-analytics DuckDB database: generic SQL tools plus golden-path tools for revenue change and alerts. The data layer of ad-revenue-copilot.",
+  "author": {
+    "name": "rinacarpova",
+    "url": "https://github.com/rinacarpova"
+  },
+  "repository": "https://github.com/rinacarpova/data-analytics-portfolio",
+  "keywords": ["mcp", "duckdb", "dbt", "ad-monetization"]
+}

@@ -1,0 +1,223 @@
+# Reference answers for the eval cases, as SQL against the project database.
+# check_answer_key.py runs every query and compares the row it returns with `expected`
+# (numbers within `tolerance`, everything else exactly), so the graders' numbers are
+# checked against the data instead of copied by hand.
+
+- case: 01-total-revenue
+  category: lookup
+  sql: |
+    select sum(revenue)                       as revenue,
+           sum(impressions)                   as impressions,
+           sum(revenue) * 1000 / sum(impressions) as ecpm
+    from fct_ad_delivery_daily
+  expected: {revenue: 39563.12, impressions: 19102772, ecpm: 2.0711}
+
+- case: 02-site-ecpm-on-a-day
+  category: trap
+  trap: avg(ecpm) over fact rows gives naive_avg_ecpm instead of the real eCPM
+  sql: |
+    select sum(revenue) * 1000 / sum(impressions) as ecpm,
+           avg(ecpm)                              as naive_avg_ecpm
+    from fct_ad_delivery_daily
+    where report_date = date '2019-06-21' and site_id = 345
+  expected: {ecpm: 2.9395, naive_avg_ecpm: 1.5351}
+
+- case: 03-top-channel
+  category: lookup
+  sql: |
+    select monetization_channel_id as top_channel,
+           revenue_share
+    from (
+        select monetization_channel_id,
+               sum(revenue) / sum(sum(revenue)) over () as revenue_share
+        from fct_ad_delivery_daily
+        group by 1
+    )
+    order by revenue_share desc
+    limit 1
+  expected: {top_channel: 19, revenue_share: 0.8559}
+
+- case: 04-viewability
+  category: trap
+  trap: viewable / all impressions instead of viewable / measurable
+  sql: |
+    select sum(viewable_impressions) / sum(measurable_impressions) as viewability_rate,
+           sum(viewable_impressions) / sum(impressions)            as wrong_denominator
+    from fct_ad_delivery_daily
+  expected: {viewability_rate: 0.39925, wrong_denominator: 0.38122}
+
+- case: 05-device-ecpm
+  category: trap
+  trap: averaging row-level eCPM gives roughly half the real values
+  sql: |
+    select sum(revenue) filter (where device_category_id = 1) * 1000
+             / sum(impressions) filter (where device_category_id = 1) as ecpm_device_1,
+           sum(revenue) filter (where device_category_id = 2) * 1000
+             / sum(impressions) filter (where device_category_id = 2) as ecpm_device_2,
+           avg(ecpm) filter (where device_category_id = 1)            as naive_device_1,
+           avg(ecpm) filter (where device_category_id = 2)            as naive_device_2
+    from fct_ad_delivery_daily
+  expected: {ecpm_device_1: 2.4385, ecpm_device_2: 1.9626, naive_device_1: 1.2755, naive_device_2: 1.0474}
+
+- case: 06-wednesday-drop
+  category: trap
+  trap: against the trailing 7 days the day looks like -33%; against previous Wednesdays it is -5%
+  sql: |
+    select revenue,
+           baseline_revenue,
+           revenue / baseline_revenue - 1     as change_vs_same_weekday,
+           revenue / trailing_7d_revenue - 1  as change_vs_trailing_7d
+    from int_delivery__vs_baseline
+    where dimension = 'total' and report_date = date '2019-06-26'
+  expected: {revenue: 1003.62, baseline_revenue: 1055.64, change_vs_same_weekday: -0.0493, change_vs_trailing_7d: -0.3300}
+
+- case: 07-dedupe
+  category: trap
+  trap: deduplicating on the dimension columns throws away real delivery
+  # Which row a deduplication keeps is arbitrary unless ordered; an arbitrary pick loses ~10%
+  # and varies between runs. Keeping the largest row of each group is deterministic and gives
+  # the smallest possible loss, so the reference is "at least 5.9%".
+  sql: |
+    with dedup_on_dimensions as (
+        select distinct on (report_date, site_id, ad_unit_id, ad_type_id, monetization_channel_id,
+                            integration_type_id, advertiser_id, order_id, line_item_type_id,
+                            geo_id, device_category_id, os_id) revenue
+        from stg_auction__delivery
+        order by report_date, site_id, ad_unit_id, ad_type_id, monetization_channel_id,
+                 integration_type_id, advertiser_id, order_id, line_item_type_id,
+                 geo_id, device_category_id, os_id, revenue desc
+    ),
+    dedup_identical as (
+        select distinct * from stg_auction__delivery
+    )
+    select (select sum(revenue) from stg_auction__delivery)                                   as total_revenue,
+           (select sum(revenue) from stg_auction__delivery) - (select sum(revenue) from dedup_on_dimensions) as lost_dedup_on_dimensions,
+           1 - (select sum(revenue) from dedup_on_dimensions) / (select sum(revenue) from stg_auction__delivery) as lost_share_dedup_on_dimensions,
+           (select sum(revenue) from stg_auction__delivery) - (select sum(revenue) from dedup_identical)     as lost_dedup_identical
+  expected: {total_revenue: 39563.12, lost_dedup_on_dimensions: 2339.65, lost_share_dedup_on_dimensions: 0.0591, lost_dedup_identical: 12.04}
+
+- case: 08-most-unusual-day
+  category: trap
+  trap: the highest-revenue day is not the most unusual one; 1-14 June have no baseline
+  sql: |
+    select (select report_date from mart_revenue_change_daily
+            order by abs(revenue_delta / baseline_revenue) desc limit 1)   as most_unusual_day,
+           (select max(revenue_delta / baseline_revenue) from mart_revenue_change_daily) as change_vs_same_weekday,
+           (select report_date from int_delivery__by_dimension_daily
+            where dimension = 'total' order by revenue desc limit 1)        as highest_revenue_day,
+           (select min(report_date) from mart_revenue_change_daily)         as first_day_with_baseline
+  expected: {most_unusual_day: "2019-06-21", change_vs_same_weekday: 0.3236, highest_revenue_day: "2019-06-24", first_day_with_baseline: "2019-06-15"}
+
+- case: 09-why-21-june
+  category: diagnosis
+  sql: |
+    select d.revenue_delta, d.revenue_delta / d.baseline_revenue as change_pct,
+           d.traffic_effect, d.mix_effect, d.rate_effect,
+           s.impressions / s.baseline_impressions as site_345_traffic_ratio,
+           a.ecpm / a.baseline_ecpm - 1           as advertiser_79_ecpm_change,
+           a.revenue / d.revenue                  as advertiser_79_share_of_day
+    from mart_revenue_change_daily d
+    join mart_revenue_change_drivers s
+      on s.report_date = d.report_date and s.dimension = 'site_id' and s.dimension_value = '345'
+    join mart_revenue_change_drivers a
+      on a.report_date = d.report_date and a.dimension = 'advertiser_id' and a.dimension_value = '79'
+    where d.report_date = date '2019-06-21'
+  expected:
+    revenue_delta: 415.46
+    change_pct: 0.3236
+    traffic_effect: 178.86
+    mix_effect: 103.21
+    rate_effect: 133.40
+    site_345_traffic_ratio: 2.13
+    advertiser_79_ecpm_change: 0.174
+    advertiser_79_share_of_day: 0.740
+
+- case: 10-channel-21-alert
+  category: diagnosis
+  sql: |
+    select (select max(report_date) from fct_ad_delivery_daily
+            where monetization_channel_id = 21 and revenue > 0)              as last_day_with_revenue,
+           (select count(*) from mart_revenue_alerts
+            where report_date = date '2019-06-15')                           as alerts_on_15_june,
+           (select count(distinct advertiser_id) from fct_ad_delivery_daily
+            where monetization_channel_id = 21)                              as advertisers_in_channel,
+           (select count(distinct ad_unit_id) from fct_ad_delivery_daily
+            where monetization_channel_id = 21)                              as ad_units_in_channel,
+           (select avg(share) from (
+                select sum(revenue) filter (where monetization_channel_id = 21) / sum(revenue) as share
+                from fct_ad_delivery_daily
+                where report_date < date '2019-06-12'
+                group by report_date))                                       as usual_share_of_day
+  expected: {last_day_with_revenue: "2019-06-12", alerts_on_15_june: 3, advertisers_in_channel: 1, ad_units_in_channel: 1, usual_share_of_day: 0.0164}
+
+- case: 11-triage-all-alerts
+  category: workflow
+  sql: |
+    select count(*)                                                   as alerts,
+           count(distinct report_date)                                as alert_days,
+           count(*) filter (where report_date = date '2019-06-21')    as alerts_21_june,
+           count(*) filter (where report_date = date '2019-06-15')    as alerts_15_june,
+           (select sum(revenue) filter (where site_id = 345) / sum(revenue)
+            from fct_ad_delivery_daily
+            where report_date = date '2019-06-21' and ad_unit_id = 5100) as ad_unit_5100_share_on_site_345
+    from mart_revenue_alerts
+  expected: {alerts: 20, alert_days: 6, alerts_21_june: 12, alerts_15_june: 3, ad_unit_5100_share_on_site_345: 1.0}
+
+- case: 12-quiet-22-june
+  category: workflow
+  sql: |
+    select d.revenue_delta, d.revenue_delta / d.baseline_revenue as change_pct, d.rate_effect,
+           a.ecpm / a.baseline_ecpm - 1 as advertiser_79_ecpm_change,
+           (select count(*) from mart_revenue_alerts where report_date = date '2019-06-22') as alerts_22_june,
+           (select count(*) from mart_revenue_alerts
+            where report_date = date '2019-06-22' and rule = 'total revenue')                as total_alert_22_june
+    from mart_revenue_change_daily d
+    join mart_revenue_change_drivers a
+      on a.report_date = d.report_date and a.dimension = 'advertiser_id' and a.dimension_value = '79'
+    where d.report_date = date '2019-06-22'
+  expected: {revenue_delta: 306.6, change_pct: 0.305, rate_effect: 192.4, advertiser_79_ecpm_change: 0.25, alerts_22_june: 2, total_alert_22_june: 0}
+
+- case: 13-advertiser-16-alert
+  category: workflow
+  sql: |
+    select max(revenue) filter (where report_date = date '2019-06-24')          as revenue_24_june,
+           max(baseline_revenue) filter (where report_date = date '2019-06-24') as baseline_24_june,
+           max(revenue) filter (where report_date = date '2019-06-25')          as revenue_25_june,
+           max(baseline_revenue) filter (where report_date = date '2019-06-25') as baseline_25_june
+    from mart_revenue_change_drivers
+    where dimension = 'advertiser_id' and dimension_value = '16'
+  expected: {revenue_24_june: 262.0, baseline_24_june: 175.3, revenue_25_june: 142.8, baseline_25_june: 141.4}
+
+- case: 14-brief-20-june
+  category: workflow
+  sql: |
+    select d.revenue_delta, d.revenue_delta / d.baseline_revenue as change_pct,
+           d.traffic_effect, d.mix_effect, d.rate_effect,
+           (select count(*) from mart_revenue_alerts where report_date = date '2019-06-20') as alerts,
+           (select change_pct from mart_revenue_alerts where report_date = date '2019-06-20') as site_351_change_pct
+    from mart_revenue_change_daily d
+    where d.report_date = date '2019-06-20'
+  expected: {revenue_delta: 210.7, change_pct: 0.144, traffic_effect: 94.3, mix_effect: 176.2, rate_effect: -59.8, alerts: 1, site_351_change_pct: 0.478}
+
+- case: 15-brief-26-june
+  category: workflow
+  sql: |
+    select revenue, baseline_revenue, revenue_delta / baseline_revenue as change_pct,
+           traffic_effect, mix_effect,
+           (select count(*) from mart_revenue_alerts where report_date = date '2019-06-26') as alerts
+    from mart_revenue_change_daily
+    where report_date = date '2019-06-26'
+  expected: {revenue: 1003.6, baseline_revenue: 1055.6, change_pct: -0.049, traffic_effect: -119.0, mix_effect: 58.8, alerts: 0}
+
+- case: 16-brief-10-june
+  category: workflow
+  sql: |
+    select (select count(*) from mart_revenue_change_daily where report_date = date '2019-06-10') as baseline_rows,
+           sum(revenue) filter (where report_date = date '2019-06-10')                            as revenue_10_june,
+           sum(revenue) filter (where report_date = date '2019-06-10') * 1000
+             / sum(impressions) filter (where report_date = date '2019-06-10')                    as ecpm_10_june,
+           sum(revenue) filter (where report_date = date '2019-06-03')                            as revenue_3_june,
+           sum(revenue) filter (where report_date = date '2019-06-10')
+             / sum(revenue) filter (where report_date = date '2019-06-03') - 1                    as change_vs_3_june
+    from fct_ad_delivery_daily
+  expected: {baseline_rows: 0, revenue_10_june: 1352.2, ecpm_10_june: 1.87, revenue_3_june: 1556.1, change_vs_3_june: -0.13}

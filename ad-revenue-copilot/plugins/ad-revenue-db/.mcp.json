@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "ad-revenue-db": {
+      "command": "uv",
+      "args": ["run", "--quiet", "--script", "${CLAUDE_PLUGIN_ROOT}/server/ad_revenue_mcp.py"],
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}
