@@ -62,7 +62,7 @@ traffic / mix / rate split. Putting that method in code made a prompt for it unn
   [`references/`](plugins/ad-revenue-copilot/references/) that the data-only arm never sees, and these
   contain dataset facts some cases touch: `mart_revenue_alerts` has 20 rows (case 11), there is no
   baseline before 15 June (cases 06, 16), the week of 10 June had an eCPM dip (case 16, also named in
-  the brief skill). So the Δ measures *workflow + reference knowledge* against data access, not the
+  the brief skill, where it stays until the next run). So the Δ measures *workflow + reference knowledge* against data access, not the
   workflow alone. The skills contain no eval answers as such (the one SQL example uses placeholders),
   but they are not free of dataset facts either.
 - **Small samples.** v1 ran 3 times per case and arm, v0 once. Read a Δ of one case as a direction.
@@ -176,7 +176,9 @@ In order of how much they would strengthen the evidence:
 - [ ] **Three arms** instead of two: data only → data + references → data + references + workflow
       skills, to separate what comes from data access, from domain knowledge and from procedure
 - [ ] Move dataset facts out of the skills into the references (the eCPM-dip line in the brief
-      skill), and pin `--model` and `--judge-model` in every reported run
+      skill), and pin `--model` and `--judge-model` in every reported run. The line is kept on
+      purpose until then: the reported v1 numbers were produced with it, and the code in the
+      repository should match the reported run
 - [ ] Rerun the number cases 3 times per arm on the workflow-skills version, keeping traces of
       failed runs (`--keep-temp`)
 - [ ] Ablation of the method tools: data only without `get_revenue_change` / `get_alerts`, to

@@ -19,13 +19,14 @@ Skill arm: the first version of the plugin, one `ad-revenue-semantic-layer` skil
 | 07-dedupe | trap | 0.00 | 0.00 | +0.00 | 1/1 | 0 / 0 | do-not-dedupe |
 | 08-most-unusual-day | trap | 1.00 | 1.00 | +0.00 | 1/1 | 0 / 0 | — |
 | 09-why-21-june | diagnosis | 1.00 | 1.00 | +0.00 | 1/1 | 0 / 0 | — |
-| 10-channel-21-alert | diagnosis | 1.00 | 1.00 | +0.00 | 1/1 | 0 / 0 | — |
+| 10-channel-21-alert | triage | 1.00 | 1.00 | +0.00 | 1/1 | 0 / 0 | — |
 
 | Type | Skill + data | Data only | Δ |
 |---|---:|---:|---:|
 | lookup (2) | 1.00 | 1.00 | +0.00 |
 | trap (6) | 0.83 | 0.83 | +0.00 |
-| diagnosis (2) | 1.00 | 1.00 | +0.00 |
+| diagnosis (1) | 1.00 | 1.00 | +0.00 |
+| triage (1) | 1.00 | 1.00 | +0.00 |
 | **overall (10)** | **0.90** | **0.90** | **+0.00** |
 
 Runs per case and arm: 1. Errored runs (excluded): 0. Total cost incl. judge: $2.33.

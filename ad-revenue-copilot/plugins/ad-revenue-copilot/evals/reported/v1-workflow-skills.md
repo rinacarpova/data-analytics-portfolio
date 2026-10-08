@@ -10,7 +10,7 @@ Skill arm: `alert-triage` + `revenue-morning-brief` + shared `references/`, as i
 
 | Case | Type | Skill + data | Data only | Δ | Skill fired | Errored runs | Failed graders (data only) |
 |---|---|---:|---:|---:|---:|---:|---|
-| 10-channel-21-alert | diagnosis | 1.00 | 0.83 | +0.17 | 3/3 | 0 / 0 | real-stop-date |
+| 10-channel-21-alert | triage | 1.00 | 0.83 | +0.17 | 3/3 | 0 / 0 | real-stop-date |
 | 11-triage-all-alerts | triage | 1.00 | 0.89 | +0.11 | 3/3 | 0 / 0 | real-timing |
 | 12-quiet-22-june | triage | 1.00 | 0.25 | +0.75 | 3/3 | 0 / 0 | cooldown |
 | 13-advertiser-16-alert | triage | 1.00 | 0.67 | +0.33 | 3/3 | 0 / 0 | one-day-spike |
@@ -20,8 +20,7 @@ Skill arm: `alert-triage` + `revenue-morning-brief` + shared `references/`, as i
 
 | Type | Skill + data | Data only | Δ |
 |---|---:|---:|---:|
-| diagnosis (1) | 1.00 | 0.83 | +0.17 |
-| triage (3) | 1.00 | 0.60 | +0.40 |
+| triage (4) | 1.00 | 0.66 | +0.34 |
 | brief (3) | 0.82 | 0.60 | +0.22 |
 | **overall (7)** | **0.92** | **0.63** | **+0.29** |
 

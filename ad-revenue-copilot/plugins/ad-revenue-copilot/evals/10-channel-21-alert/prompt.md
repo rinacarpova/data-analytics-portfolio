@@ -1,6 +1,6 @@
 ---
 description: "Triage the stopped-delivering alerts of 15 June"
-tags: [diagnosis, alerts]
+tags: [triage, alerts]
 plugins: ["../..", "../../../ad-revenue-db"]
 max_turns: 20
 allowed_tools: [Skill]
