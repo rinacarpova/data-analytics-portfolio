@@ -18,7 +18,7 @@ answered the number questions just as well without it. The skills were then rewr
 
 | Run | Questions | Cases × runs | Skill arm | Data only | Δ |
 |---|---|---:|---:|---:|---:|
-| v0: semantic-layer skill | Numbers: lookups, data traps, a revenue diagnosis | 9 × 1 | 0.89 | 0.89 | 0.00 |
+| v0: semantic-layer skill | Numbers (lookups, data traps, a revenue diagnosis) and one alert case | 10 × 1 | 0.90 | 0.90 | 0.00 |
 | v1: workflow skills | Alert triage (incl. one stop alert) | 4 × 3 | **1.00** | 0.66 | **+0.34** |
 | v1: workflow skills | Daily revenue brief | 3 × 3 | **0.82** | 0.60 | **+0.22** |
 
