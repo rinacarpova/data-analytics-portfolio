@@ -77,6 +77,8 @@ def run_arm(arm: str, eval_dir: Path, out_dir: Path, args: argparse.Namespace) -
         cmd += ["--case", args.case]
     if args.model:
         cmd += ["--model", args.model]
+    if args.judge_model:
+        cmd += ["--judge-model", args.judge_model]
     if args.max_cost_usd:
         cmd += ["--max-cost-usd", str(args.max_cost_usd)]
     print(f"\n== {arm}: {' '.join(cmd[1:])}", flush=True)
@@ -167,11 +169,45 @@ def comparison_table(results: dict[str, dict]) -> str:
     return "\n".join(lines)
 
 
+def run_metadata(results: dict[str, dict], model: str | None, judge_model: str | None) -> list[str]:
+    """What is needed to reproduce or compare the run: CLI version, models, date, scoring."""
+    first = results["skill+data"]
+    return [
+        f"- Date: {first.get('startedAt', '?')[:10]}",
+        f"- Claude Code: {first.get('claudeVersion', '?')}",
+        f"- Agent model: {model or 'not pinned (the CLI default at run time; not recorded by the CLI)'}",
+        f"- LLM judge: {judge_model or 'not pinned (claude plugin eval default)'}, 3 votes per grader, pass on 2",
+        "- Score: weighted share of graders passed within a run, averaged over runs, then averaged "
+        "equally across cases (each question counts once). Errored runs are excluded.",
+    ]
+
+
+def compact_results(results: dict[str, dict]) -> list[dict]:
+    """One row per case, arm and run: enough to audit the table without the full traces."""
+    rows = []
+    for arm, result in results.items():
+        for case in result["cases"]:
+            for i, run in enumerate(case["arms"]["with"]):
+                graders = {g["name"]: g["passed"] for g in run["graders"]}
+                rows.append({
+                    "case": case["name"],
+                    "arm": arm,
+                    "run": i + 1,
+                    "error": run.get("error"),
+                    "turns": run.get("turns"),
+                    "cost_usd": round(run.get("costUsd", 0) + run.get("judgeCostUsd", 0), 4),
+                    "graders_passed": sorted(k for k, v in graders.items() if v),
+                    "graders_failed": sorted(k for k, v in graders.items() if not v),
+                })
+    return rows
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--runs", type=int, default=3)
     parser.add_argument("--case", help="case name glob, e.g. '09-*'")
-    parser.add_argument("--model", help="model for the agent runs, e.g. sonnet")
+    parser.add_argument("--model", help="model for the agent runs, e.g. sonnet (recommended: pin it)")
+    parser.add_argument("--judge-model", help="model for the LLM graders")
     parser.add_argument("-j", "--concurrency", type=int, default=2)
     parser.add_argument("--max-cost-usd", type=float, help="cost ceiling per arm")
     args = parser.parse_args()
@@ -180,8 +216,9 @@ def main() -> None:
     out_dir = RESULTS / f"comparison-{dt.datetime.now():%Y-%m-%dT%H-%M-%S}"
     out_dir.mkdir(parents=True)
     results = {arm: run_arm(arm, eval_dir, out_dir, args) for arm, eval_dir in ARMS.items()}
-    table = comparison_table(results)
+    table = "\n".join(run_metadata(results, args.model, args.judge_model)) + "\n\n" + comparison_table(results)
     (out_dir / "comparison.md").write_text(table + "\n", encoding="utf-8")
+    (out_dir / "compact.json").write_text(json.dumps(compact_results(results), indent=1) + "\n", encoding="utf-8")
     print("\n" + table + f"\n\nSaved to {out_dir / 'comparison.md'}")
 
 

@@ -14,7 +14,7 @@
     {
       "name": "ad-revenue-copilot",
       "source": "./ad-revenue-copilot/plugins/ad-revenue-copilot",
-      "description": "Semantic layer for ad revenue analytics on public publisher data, with evals."
+      "description": "Workflow skills for ad revenue alert triage and daily reporting, with an eval suite."
     }
   ]
 }

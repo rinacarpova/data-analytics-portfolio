@@ -1,0 +1,271 @@
+[
+ {
+  "case": "01-total-revenue",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 9,
+  "cost_usd": 0.1094,
+  "graders_passed": [
+   "ecpm",
+   "revenue",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "02-site-ecpm-on-a-day",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 10,
+  "cost_usd": 0.1151,
+  "graders_passed": [
+   "ecpm",
+   "not-averaged",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "03-top-channel",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 6,
+  "cost_usd": 0.0847,
+  "graders_passed": [
+   "channel",
+   "share",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "04-viewability",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 10,
+  "cost_usd": 0.1157,
+  "graders_passed": [
+   "right-denominator",
+   "skill-loaded",
+   "viewability"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "05-device-ecpm",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 6,
+  "cost_usd": 0.0931,
+  "graders_passed": [
+   "device-1",
+   "device-2",
+   "not-averaged",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "06-wednesday-drop",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 7,
+  "cost_usd": 0.1189,
+  "graders_passed": [
+   "same-weekday-baseline",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "07-dedupe",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 3,
+  "cost_usd": 0.0642,
+  "graders_passed": [
+   "skill-loaded"
+  ],
+  "graders_failed": [
+   "do-not-dedupe"
+  ]
+ },
+ {
+  "case": "08-most-unusual-day",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 8,
+  "cost_usd": 0.1427,
+  "graders_passed": [
+   "date",
+   "right-day",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "09-why-21-june",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 5,
+  "cost_usd": 0.13,
+  "graders_passed": [
+   "delta",
+   "diagnosis",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "10-channel-21-alert",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 8,
+  "cost_usd": 0.1524,
+  "graders_passed": [
+   "real-stop-date",
+   "skill-loaded",
+   "triage"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "01-total-revenue",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 8,
+  "cost_usd": 0.0964,
+  "graders_passed": [
+   "ecpm",
+   "revenue"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "02-site-ecpm-on-a-day",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 7,
+  "cost_usd": 0.0863,
+  "graders_passed": [
+   "ecpm",
+   "not-averaged"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "03-top-channel",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 13,
+  "cost_usd": 0.1319,
+  "graders_passed": [
+   "channel",
+   "share"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "04-viewability",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 9,
+  "cost_usd": 0.1044,
+  "graders_passed": [
+   "right-denominator",
+   "viewability"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "05-device-ecpm",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 8,
+  "cost_usd": 0.102,
+  "graders_passed": [
+   "device-1",
+   "device-2",
+   "not-averaged"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "06-wednesday-drop",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 4,
+  "cost_usd": 0.0906,
+  "graders_passed": [
+   "same-weekday-baseline"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "07-dedupe",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 12,
+  "cost_usd": 0.1342,
+  "graders_passed": [],
+  "graders_failed": [
+   "do-not-dedupe"
+  ]
+ },
+ {
+  "case": "08-most-unusual-day",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 4,
+  "cost_usd": 0.1167,
+  "graders_passed": [
+   "date",
+   "right-day"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "09-why-21-june",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 5,
+  "cost_usd": 0.107,
+  "graders_passed": [
+   "delta",
+   "diagnosis"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "10-channel-21-alert",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 14,
+  "cost_usd": 0.2362,
+  "graders_passed": [
+   "real-stop-date",
+   "triage"
+  ],
+  "graders_failed": []
+ }
+]

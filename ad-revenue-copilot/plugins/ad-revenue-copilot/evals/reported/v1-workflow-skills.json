@@ -1,0 +1,574 @@
+[
+ {
+  "case": "10-channel-21-alert",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 11,
+  "cost_usd": 0.1799,
+  "graders_passed": [
+   "real-stop-date",
+   "skill-loaded",
+   "triage"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "10-channel-21-alert",
+  "arm": "skill+data",
+  "run": 2,
+  "error": null,
+  "turns": 14,
+  "cost_usd": 0.216,
+  "graders_passed": [
+   "real-stop-date",
+   "skill-loaded",
+   "triage"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "10-channel-21-alert",
+  "arm": "skill+data",
+  "run": 3,
+  "error": null,
+  "turns": 15,
+  "cost_usd": 0.206,
+  "graders_passed": [
+   "real-stop-date",
+   "skill-loaded",
+   "triage"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "11-triage-all-alerts",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 27,
+  "cost_usd": 0.6688,
+  "graders_passed": [
+   "grouped-into-events",
+   "real-timing",
+   "skill-loaded",
+   "verdicts"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "11-triage-all-alerts",
+  "arm": "skill+data",
+  "run": 2,
+  "error": null,
+  "turns": 32,
+  "cost_usd": 0.6036,
+  "graders_passed": [
+   "grouped-into-events",
+   "real-timing",
+   "skill-loaded",
+   "verdicts"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "11-triage-all-alerts",
+  "arm": "skill+data",
+  "run": 3,
+  "error": null,
+  "turns": 22,
+  "cost_usd": 0.4906,
+  "graders_passed": [
+   "grouped-into-events",
+   "real-timing",
+   "skill-loaded",
+   "verdicts"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "12-quiet-22-june",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 14,
+  "cost_usd": 0.396,
+  "graders_passed": [
+   "cooldown",
+   "delta",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "12-quiet-22-june",
+  "arm": "skill+data",
+  "run": 2,
+  "error": null,
+  "turns": 12,
+  "cost_usd": 0.3527,
+  "graders_passed": [
+   "cooldown",
+   "delta",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "12-quiet-22-june",
+  "arm": "skill+data",
+  "run": 3,
+  "error": null,
+  "turns": 10,
+  "cost_usd": 0.2528,
+  "graders_passed": [
+   "cooldown",
+   "delta",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "13-advertiser-16-alert",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 11,
+  "cost_usd": 0.2226,
+  "graders_passed": [
+   "one-day-spike",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "13-advertiser-16-alert",
+  "arm": "skill+data",
+  "run": 2,
+  "error": null,
+  "turns": 11,
+  "cost_usd": 0.2521,
+  "graders_passed": [
+   "one-day-spike",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "13-advertiser-16-alert",
+  "arm": "skill+data",
+  "run": 3,
+  "error": null,
+  "turns": 10,
+  "cost_usd": 0.1683,
+  "graders_passed": [
+   "one-day-spike",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "14-brief-20-june",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 5,
+  "cost_usd": 0.1272,
+  "graders_passed": [
+   "brevity",
+   "change",
+   "skill-loaded"
+  ],
+  "graders_failed": [
+   "content"
+  ]
+ },
+ {
+  "case": "14-brief-20-june",
+  "arm": "skill+data",
+  "run": 2,
+  "error": null,
+  "turns": 7,
+  "cost_usd": 0.1929,
+  "graders_passed": [
+   "brevity",
+   "change",
+   "content",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "14-brief-20-june",
+  "arm": "skill+data",
+  "run": 3,
+  "error": null,
+  "turns": 5,
+  "cost_usd": 0.1526,
+  "graders_passed": [
+   "brevity",
+   "change",
+   "content",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "15-brief-26-june",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 5,
+  "cost_usd": 0.1077,
+  "graders_passed": [
+   "calm",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "15-brief-26-june",
+  "arm": "skill+data",
+  "run": 2,
+  "error": null,
+  "turns": 5,
+  "cost_usd": 0.1207,
+  "graders_passed": [
+   "skill-loaded"
+  ],
+  "graders_failed": [
+   "calm"
+  ]
+ },
+ {
+  "case": "15-brief-26-june",
+  "arm": "skill+data",
+  "run": 3,
+  "error": null,
+  "turns": 7,
+  "cost_usd": 0.1362,
+  "graders_passed": [
+   "calm",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "16-brief-10-june",
+  "arm": "skill+data",
+  "run": 1,
+  "error": null,
+  "turns": 12,
+  "cost_usd": 0.1442,
+  "graders_passed": [
+   "no-baseline",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "16-brief-10-june",
+  "arm": "skill+data",
+  "run": 2,
+  "error": null,
+  "turns": 9,
+  "cost_usd": 0.113,
+  "graders_passed": [
+   "no-baseline",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "16-brief-10-june",
+  "arm": "skill+data",
+  "run": 3,
+  "error": null,
+  "turns": 12,
+  "cost_usd": 0.1467,
+  "graders_passed": [
+   "no-baseline",
+   "skill-loaded"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "10-channel-21-alert",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 10,
+  "cost_usd": 0.1745,
+  "graders_passed": [
+   "triage"
+  ],
+  "graders_failed": [
+   "real-stop-date"
+  ]
+ },
+ {
+  "case": "10-channel-21-alert",
+  "arm": "data-only",
+  "run": 2,
+  "error": null,
+  "turns": 11,
+  "cost_usd": 0.1933,
+  "graders_passed": [
+   "real-stop-date",
+   "triage"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "10-channel-21-alert",
+  "arm": "data-only",
+  "run": 3,
+  "error": null,
+  "turns": 8,
+  "cost_usd": 0.1366,
+  "graders_passed": [
+   "triage"
+  ],
+  "graders_failed": [
+   "real-stop-date"
+  ]
+ },
+ {
+  "case": "11-triage-all-alerts",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 18,
+  "cost_usd": 0.3875,
+  "graders_passed": [
+   "grouped-into-events",
+   "verdicts"
+  ],
+  "graders_failed": [
+   "real-timing"
+  ]
+ },
+ {
+  "case": "11-triage-all-alerts",
+  "arm": "data-only",
+  "run": 2,
+  "error": null,
+  "turns": 9,
+  "cost_usd": 0.3419,
+  "graders_passed": [
+   "grouped-into-events",
+   "real-timing",
+   "verdicts"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "11-triage-all-alerts",
+  "arm": "data-only",
+  "run": 3,
+  "error": null,
+  "turns": 14,
+  "cost_usd": 0.3901,
+  "graders_passed": [
+   "grouped-into-events",
+   "real-timing",
+   "verdicts"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "12-quiet-22-june",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 3,
+  "cost_usd": 0.093,
+  "graders_passed": [
+   "delta"
+  ],
+  "graders_failed": [
+   "cooldown"
+  ]
+ },
+ {
+  "case": "12-quiet-22-june",
+  "arm": "data-only",
+  "run": 2,
+  "error": null,
+  "turns": 7,
+  "cost_usd": 0.1754,
+  "graders_passed": [
+   "delta"
+  ],
+  "graders_failed": [
+   "cooldown"
+  ]
+ },
+ {
+  "case": "12-quiet-22-june",
+  "arm": "data-only",
+  "run": 3,
+  "error": null,
+  "turns": 4,
+  "cost_usd": 0.1178,
+  "graders_passed": [
+   "delta"
+  ],
+  "graders_failed": [
+   "cooldown"
+  ]
+ },
+ {
+  "case": "13-advertiser-16-alert",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 4,
+  "cost_usd": 0.0885,
+  "graders_passed": [
+   "one-day-spike"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "13-advertiser-16-alert",
+  "arm": "data-only",
+  "run": 2,
+  "error": null,
+  "turns": 4,
+  "cost_usd": 0.0954,
+  "graders_passed": [
+   "one-day-spike"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "13-advertiser-16-alert",
+  "arm": "data-only",
+  "run": 3,
+  "error": null,
+  "turns": 4,
+  "cost_usd": 0.0964,
+  "graders_passed": [],
+  "graders_failed": [
+   "one-day-spike"
+  ]
+ },
+ {
+  "case": "14-brief-20-june",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 7,
+  "cost_usd": 0.126,
+  "graders_passed": [
+   "change",
+   "content"
+  ],
+  "graders_failed": [
+   "brevity"
+  ]
+ },
+ {
+  "case": "14-brief-20-june",
+  "arm": "data-only",
+  "run": 2,
+  "error": null,
+  "turns": 4,
+  "cost_usd": 0.1037,
+  "graders_passed": [
+   "change",
+   "content"
+  ],
+  "graders_failed": [
+   "brevity"
+  ]
+ },
+ {
+  "case": "14-brief-20-june",
+  "arm": "data-only",
+  "run": 3,
+  "error": null,
+  "turns": 4,
+  "cost_usd": 0.0991,
+  "graders_passed": [
+   "change",
+   "content"
+  ],
+  "graders_failed": [
+   "brevity"
+  ]
+ },
+ {
+  "case": "15-brief-26-june",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 4,
+  "cost_usd": 0.0956,
+  "graders_passed": [],
+  "graders_failed": [
+   "calm"
+  ]
+ },
+ {
+  "case": "15-brief-26-june",
+  "arm": "data-only",
+  "run": 2,
+  "error": null,
+  "turns": 5,
+  "cost_usd": 0.0985,
+  "graders_passed": [],
+  "graders_failed": [
+   "calm"
+  ]
+ },
+ {
+  "case": "15-brief-26-june",
+  "arm": "data-only",
+  "run": 3,
+  "error": null,
+  "turns": 5,
+  "cost_usd": 0.0968,
+  "graders_passed": [],
+  "graders_failed": [
+   "calm"
+  ]
+ },
+ {
+  "case": "16-brief-10-june",
+  "arm": "data-only",
+  "run": 1,
+  "error": null,
+  "turns": 11,
+  "cost_usd": 0.1425,
+  "graders_passed": [
+   "no-baseline"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "16-brief-10-june",
+  "arm": "data-only",
+  "run": 2,
+  "error": null,
+  "turns": 15,
+  "cost_usd": 0.2692,
+  "graders_passed": [
+   "no-baseline"
+  ],
+  "graders_failed": []
+ },
+ {
+  "case": "16-brief-10-june",
+  "arm": "data-only",
+  "run": 3,
+  "error": null,
+  "turns": 11,
+  "cost_usd": 0.1795,
+  "graders_passed": [
+   "no-baseline"
+  ],
+  "graders_failed": []
+ }
+]

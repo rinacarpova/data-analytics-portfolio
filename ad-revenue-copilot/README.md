@@ -7,24 +7,34 @@ Built on public data only.
 ## Result
 
 **Deterministic knowledge belongs in the data model and its tools; skills earn their place in
-procedures and judgement.**
+procedures and judgement.** This is a development-set result (see [Limits of the evidence](#limits-of-the-evidence)):
+a direction worth testing, not a measured effect size.
 
 The project started as one plugin with a "semantic layer" skill: metric definitions, the
-same-weekday baseline, data traps. The eval showed that this skill added nothing. With read-only
-access to the dbt marts and two tools that run the project's method in code, Claude answered
-the number questions just as well without it. The skills were rewritten as **workflows**
-(triaging alerts, writing a daily brief), and those changed the answers:
+same-weekday baseline, data traps (**v0**). The eval showed that this skill added nothing. With
+read-only access to the dbt marts and two tools that run the project's method in code, Claude
+answered the number questions just as well without it. The skills were then rewritten as
+**workflows**: triaging alerts and writing a daily brief (**v1**), and those changed the answers:
 
-| Questions | Cases | Skills + data | Data only | Δ |
-|---|---:|---:|---:|---:|
-| Numbers: lookups, data traps, a revenue diagnosis | 9 | 0.89 | 0.89 | 0.00 |
-| Alert triage (incl. one stop alert) | 4 | **1.00** | 0.66 | **+0.34** |
-| Daily revenue brief | 3 | **0.82** | 0.60 | **+0.22** |
+| Run | Questions | Cases × runs | Skill arm | Data only | Δ |
+|---|---|---:|---:|---:|---:|
+| v0: semantic-layer skill | Numbers: lookups, data traps, a revenue diagnosis | 9 × 1 | 0.89 | 0.89 | 0.00 |
+| v1: workflow skills | Alert triage (incl. one stop alert) | 4 × 3 | **1.00** | 0.66 | **+0.34** |
+| v1: workflow skills | Daily revenue brief | 3 × 3 | **0.82** | 0.60 | **+0.22** |
 
-Scores are the weighted share of graders passed. Workflow cases: 3 runs per case and arm (42 runs,
-$8.75 incl. the LLM judge). Number cases: 1 run per arm.
+Score: the weighted share of graders passed within a run, averaged over runs, then averaged
+equally across cases, so each question counts once. Per-case tables, every run's passed and
+failed graders, errors and cost are committed in [`evals/reported/`](plugins/ad-revenue-copilot/evals/reported/).
 
-What the skills changed, from the graders and traces:
+| Run metadata | |
+|---|---|
+| Date | 8 October 2026 |
+| Claude Code | 2.1.278 |
+| Agent model | not pinned: the CLI default at run time, which the CLI does not record |
+| LLM judge | not pinned: the `claude plugin eval` default; 3 votes per grader, pass on 2 |
+| Cost | v0 $2.33 (20 runs), v1 $8.75 (42 runs), incl. the judge |
+
+What the workflow skills changed, from the graders and traces:
 
 - **Silence is not "all clear".** On 22 June only two small alerts fired, yet revenue was +30%
   against previous Saturdays: the main buyer was still paying more. The total-revenue alert was
@@ -38,10 +48,29 @@ What the skills changed, from the graders and traces:
 - **One driver, not five.** Without the skill, the 20 June brief failed the brevity check (too long,
   or the main buyer repeated under its geo, channel and ad type) in 3 of 3 runs; with it, 0 of 3.
 
-And what they did not change: on lookups, eCPM and viewability definitions, the same-weekday
-baseline and the 21 June diagnosis, both arms scored the same. Claude computes ratios from sums
-unprompted, and `get_revenue_change` already returns the same-weekday comparison and the
+And what the v0 skill did not change: on lookups, eCPM and viewability definitions, the
+same-weekday baseline and the 21 June diagnosis, both arms scored the same. Claude computes ratios
+from sums unprompted, and `get_revenue_change` already returns the same-weekday comparison and the
 traffic / mix / rate split. Putting that method in code made a prompt for it unnecessary.
+
+### Limits of the evidence
+
+- **Development set, not held-out.** The v1 skills were written after v0 failed, and cases 11–16
+  were written alongside them by the same author. The v1 numbers show the skills work on the cases
+  they were built for. Held-out cases written after the skills are frozen are the next step.
+- **The skill arm also gets reference knowledge, not only procedure.** Both skills link to shared
+  [`references/`](plugins/ad-revenue-copilot/references/) that the data-only arm never sees, and these
+  contain dataset facts some cases touch: `mart_revenue_alerts` has 20 rows (case 11), there is no
+  baseline before 15 June (cases 06, 16), the week of 10 June had an eCPM dip (case 16, also named in
+  the brief skill). So the Δ measures *workflow + reference knowledge* against data access, not the
+  workflow alone. The skills contain no eval answers as such (the one SQL example uses placeholders),
+  but they are not free of dataset facts either.
+- **Small samples.** v1 ran 3 times per case and arm, v0 once. Read a Δ of one case as a direction.
+- **The judge votes on criteria I wrote.** They are explicit and their numbers are checked against
+  computed references, but they encode my view of a good triage and a good brief.
+- In cases 14 and 15 the skill arm failed one of three runs; those traces were not kept.
+- One month of one publisher's data. The skills' thresholds (±10% for a "normal" day, ≥ 5% of daily
+  revenue to act) are reasonable defaults, not calibrated.
 
 ## Design
 
@@ -51,9 +80,6 @@ traffic / mix / rate split. Putting that method in code made a prompt for it unn
 | [`ad-revenue-copilot`](plugins/ad-revenue-copilot/) | Two skills and shared [references](plugins/ad-revenue-copilot/references/) | **Procedure and judgement**: [`alert-triage`](plugins/ad-revenue-copilot/skills/alert-triage/SKILL.md) groups alerts into events, finds the real start, checks what the cooldown hides, sizes and rates each event; [`revenue-morning-brief`](plugins/ad-revenue-copilot/skills/revenue-morning-brief/SKILL.md) writes a fixed two-minute brief with a normal / watch / act verdict |
 
 They are separate plugins so the eval can remove the skills while keeping data access.
-
-The skills hold procedures and rules, never the answers to eval questions (the one SQL example
-in `alert-triage` uses placeholders). Otherwise the eval would measure copying.
 
 ### Guardrails of the MCP server
 
@@ -107,17 +133,6 @@ comparison measured data access, not knowledge.
 [`scripts/run_evals.py`](scripts/run_evals.py) fixes this: it builds a copy of the suite that loads
 only `ad-revenue-db`, runs both arms with `--ablation none`, and merges the results into one table.
 
-### Limitations
-
-- The number cases (01–09) ran once per arm; the workflow cases three times. Small samples:
-  read a Δ of one case as a direction, not a measurement.
-- LLM judges vote on criteria I wrote. They are explicit and checked against computed references,
-  but they encode my view of a good triage and a good brief.
-- In cases 14 and 15 the skill arm failed one of three runs; the traces of that run were not kept,
-  so the cause is not diagnosed yet.
-- One month of one publisher's data. The skills' thresholds (±10% for a "normal" day, ≥ 5% of daily
-  revenue to act) are reasonable defaults, not calibrated.
-
 ## Run
 
 Requires [uv](https://docs.astral.sh/uv/) and the database of
@@ -154,9 +169,18 @@ is disabled.
 
 ## Next steps
 
-- [ ] Rerun the number cases three times per arm, and keep traces of failed runs (`--keep-temp`)
-- [ ] Ablation of the method tools: data-only without `get_revenue_change` / `get_alerts`, to measure
-      how much of the 0.89 comes from putting the method in code
+In order of how much they would strengthen the evidence:
+
+- [ ] **Held-out cases**: 4–6 new stakeholder questions on triage and briefs, written after the
+      skills are frozen and run once, with no skill edits in between
+- [ ] **Three arms** instead of two: data only → data + references → data + references + workflow
+      skills, to separate what comes from data access, from domain knowledge and from procedure
+- [ ] Move dataset facts out of the skills into the references (the eCPM-dip line in the brief
+      skill), and pin `--model` and `--judge-model` in every reported run
+- [ ] Rerun the number cases 3 times per arm on the workflow-skills version, keeping traces of
+      failed runs (`--keep-temp`)
+- [ ] Ablation of the method tools: data only without `get_revenue_change` / `get_alerts`, to
+      measure how much comes from putting the method in code
 - [ ] Cases the data cannot answer (why a buyer paid more): Claude should say so and say who can
 
 ## Structure
@@ -175,7 +199,8 @@ is disabled.
 │       ├── references/                   # models, metrics, data traps (shared by both skills)
 │       └── evals/
 │           ├── 01-total-revenue/ … 16-brief-10-june/   # prompt.md + graders/
-│           └── answer-key/               # reference SQL + checker
+│           ├── answer-key/               # reference SQL + checker
+│           └── reported/                 # per-case tables and per-run grader results of the reported runs
 ├── scripts/run_evals.py                  # skills + data vs data only
 ├── tests/test_server.py                  # guardrails and method tools
 ├── pyproject.toml
