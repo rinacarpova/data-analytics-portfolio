@@ -24,3 +24,6 @@ A dbt + DuckDB project on public ad delivery data: a tested data model, a breakd
 
 ### [Ad Revenue Copilot: Claude Plugins for Ad Revenue Analytics](ad-revenue-copilot/)
 Two Claude Code plugins on top of the ad revenue model: a read-only MCP server that runs the analysis method in code, and workflow skills for alert triage and a daily revenue brief. An eval suite of 16 cases with computed reference answers shows where each layer helps: the data layer alone handles most lookup and metric questions correctly (one data-trap case failed with and without the skill), and on a development set of 7 triage and briefing cases the workflow-skill arm scores 0.92 overall versus 0.63 with data access alone.
+
+### [Why the KYC Pass Rate Is Falling](kyc-pass-rate-analysis/)
+A Python/Jupyter investigation of a declining identity-verification pass rate: data quality checks, separating noise from the trend, testing hypotheses (vendor outages, country mix, rejection reasons), decomposing the drop, and a short presentation with recommendations.
